@@ -10,34 +10,61 @@ let newArr = [];
 // console.log(Object.keys(jobs));
 for (let i = 0; i < jobs.length; i++) {//loopina per viss darbus
     for (let j = 0; j < jobs[i]['data'].length; j++) { //loopina per vieno is darbu data visas values
-        for (let k = 0; k < jobs[i]['data'][j].length; k++) {
-            handleReferences(jobs[i]['data']);
+
+        for (let k = 0; k < jobs[i]['data'][j].length; k++) { //loopina per values sudedamasias dalis, kurios yra arba values, arba formules
             if (Object.keys(jobs[i]['data'][j][k]) == 'formula') {
-                console.log(`radau formule: ${Object.keys(jobs[i]['data'][j][k])}`);
-                const replacedFormula = handleFormula(convertedJob);
+                // console.log(`radau formule: ${Object.keys(jobs[i]['data'][j][k])}`);
+                // const replacedFormula = handleFormula(jobs[i]['data'][j]);
+                console.log(handleJobReferences(jobs[i]['data'][j]));
+                // console.log(`${i}-tas darbas ` + jobs[i]['data'][j]);
             } else {
-                console.log(`formules nera, yra tik ${Object.keys(jobs[i]['data'][j][k])} `);
+                // console.log(`radau ${Object.keys(jobs[i]['data'][j][k])} `);
             }
         }
     }
 }
 
-function handleFormula(formula, job) {
-    const convertedJob = handleReferences(job)
-    return { 'value': calculatedValue }
-}
+function handleJobReferences(job) {
+    for (let i = 0; i < job.length; i++) {
+        if (Object.keys(job[i]) == 'formula') {
+            for (let j = 0; j < job[i].length; j++) {
+                if (Object.keys(job[i][j]) == 'reference') {
+                    replaceReference(job, job[i][j])
+                }
+            }
+        }
 
-function handleReferences(job) {
+    }
 
-}
+    function replaceReference(job, reference) {
+        const splicedReference = reference.split("");
+        let x = charCodeAt(splicedReference[0] - 65);
+        let y = splicedReference[1];
+        console.log(job[x][y]);
 
+    }
+
+    // function convertReferencesIntoValues(job) {
+    //     //gaunu darbo visas formules ir values. array, sudaryta is array, kuriu vidus - objektai 
+    //     // [[{}, {}], [{}, {}]]
+    //     //ieskau formula laukelio
+    //     //formula laukelyje ieskau reference laukelio
+    //     //reference ieskau a1 notaciju
+    //     //a1 notacija isskaidau ir paverciu charais
+    //     //ziuriu, ar egzsistuoja job[a] ir job[1]
+    //     //jei egzistuoja, replace
+    //     //jei ne, grazinu klaida
+    //     console.log(job);
+    //     for (let i = 0; i < job.length; i++)
+    //         job
+    // }
 
 
 // N O T E S :
 //
     //jobs[i]['data'] - konkretus darbas
-    //jobs[i]['data'][j] - konkretaus darbo viena is value (pvz.: value: {number:5} arba value:{number:7}, {formula: })
-    //Object.keys(jobs[i]['data'][j][k] - reiksme: formula arba value
+    //jobs[i]['data'][j] - konkretaus darbo viena is value (pvz.: value: {number:5} arba value:{number:7}, {formula: }). cia yra tas lygmuo, kur keisis skaiciai (c1, c2, c3)
+    //Object.keys(jobs[i]['data'][j][k] - reiksme: formula arba value. lygmuo kuriame keisis raides (a1 b1 c1)
 
 
 
