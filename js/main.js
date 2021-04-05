@@ -10,11 +10,13 @@ const jobs = data['jobs'];
 for (let i = 0; i < jobs.length; i++) {//loopina per viss darbus
     for (let j = 0; j < jobs[i]['data'].length; j++) { //loopina per vieno is darbu data visas values
         for (let k = 0; k < jobs[i]['data'][j].length; k++) { //loopina per values sudedamasias dalis, kurios yra arba values, arba formules
-            if (Object.keys(jobs[i]['data'][j][k]) === 'formula') {
-                if (Object.keys(jobs[i]['data'][j][k][0]) !== 'reference') {
-                    doSomething(jobs[i]['data'][j][k][0])
+            if (Object.keys(jobs[i]['data'][j][k]) == 'formula') {
+                if (Object.keys(jobs[i]['data'][j][k]['formula']) != 'reference') {
+                    handleJobReferences(jobs[i]['data'][j][k]['formula'])
+                    //siunciu sum:referensai
+                    //yra operatorius, todel reiks ir taisyti referensus, ir skaiciuoti
                 } else {
-                    doSomething(jobs[i]['data'][j][k])
+                    handleJobReferences(jobs[i]['data'][j][k]); //siunciu formula:referensai
                 }
             }
         }
