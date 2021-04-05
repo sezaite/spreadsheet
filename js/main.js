@@ -6,19 +6,16 @@ async function getData() {
 const data = await getData();
 
 const jobs = data['jobs'];
-let newArr = [];
-// console.log(Object.keys(jobs));
+
 for (let i = 0; i < jobs.length; i++) {//loopina per viss darbus
     for (let j = 0; j < jobs[i]['data'].length; j++) { //loopina per vieno is darbu data visas values
-
         for (let k = 0; k < jobs[i]['data'][j].length; k++) { //loopina per values sudedamasias dalis, kurios yra arba values, arba formules
-            if (Object.keys(jobs[i]['data'][j][k]) == 'formula') {
-                // console.log(`radau formule: ${Object.keys(jobs[i]['data'][j][k])}`);
-                // const replacedFormula = handleFormula(jobs[i]['data'][j]);
-                console.log(handleJobReferences(jobs[i]['data'][j]));
-                // console.log(`${i}-tas darbas ` + jobs[i]['data'][j]);
-            } else {
-                // console.log(`radau ${Object.keys(jobs[i]['data'][j][k])} `);
+            if (Object.keys(jobs[i]['data'][j][k]) === 'formula') {
+                if (Object.keys(jobs[i]['data'][j][k][0]) !== 'reference') {
+                    doSomething(jobs[i]['data'][j][k][0])
+                } else {
+                    doSomething(jobs[i]['data'][j][k])
+                }
             }
         }
     }
@@ -35,14 +32,21 @@ function handleJobReferences(job) {
         }
 
     }
-
-    function replaceReference(job, reference) {
-        const splicedReference = reference.split("");
-        let x = charCodeAt(splicedReference[0] - 65);
-        let y = splicedReference[1];
-        console.log(job[x][y]);
-
+}
+function replaceReference(job, reference) {
+    const splicedReference = reference.split("");
+    let x = charCodeAt(splicedReference[0] - 65);
+    let y = splicedReference[1] - 1;
+    if (Object.keys(job[x][y]) == 'value') {
+        return job[x][y];
+    } else if (Object.keys(job[x][y]) == 'reference') {
+        return replaceReference(job, job[x][y])
+    } else {
+        console.error('Error: reference error!')
+        return false;
     }
+
+}
 
     // function convertReferencesIntoValues(job) {
     //     //gaunu darbo visas formules ir values. array, sudaryta is array, kuriu vidus - objektai 
