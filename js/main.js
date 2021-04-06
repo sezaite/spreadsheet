@@ -14,12 +14,13 @@ for (let i = 0; i < jobs.length; i++) {//loopina per visus darbus kaip kad job1
             if (Object.keys(jobs[i]['data'][j][k]) == 'formula') { //jeigu objekto key yra formule, reiskia, reikes kazka keisti (nes value paliekam kaip yra)
                 //ATSIJOJAM TAS FORMULES, KURIOS BE OPERATORIU:
                 if (Object.keys(jobs[i]['data'][j][k]['formula']) == 'reference') { //
+                    console.log('from the job nr: ' + jobs[i]['id']);
                     const newValue = replaceReference(jobs[i]['data'][j][k]['formula']['reference'], jobs[i]['data']);
                     console.log(newValue);
                     if (Object.keys(newValue) == 'error') {
-                        jobs[i]['data'][j][k] = { 'error': newValue };
+                        jobs[i]['data'][j][k] = { 'error': newValue['error'] };
                     } else {
-                        jobs[i]['data'][j][k] = { 'value': newValue };
+                        jobs[i]['data'][j][k] = { 'value': newValue['value'] };
                     }
                     //FORMULES SU OPERATORIAIS:
                 } else {
@@ -44,10 +45,10 @@ function replaceReference(reference, job) {
     let y = (splicedReference[0].charCodeAt()) - 65;
     let x = splicedReference[1] - 1;
     console.log(x, y);
-    if (Object.keys(job[x][y]) && Object.keys(job[x][y]) == 'value') {
+    if (Object.keys(job[x][y]) == 'value') {
         return { 'value': job[x][y] };
-    } else if (Object.keys(job[x][y]) && Object.keys(job[x][y]) == 'reference') {
-        return replaceReference(job, job[x][y])
+    } else if (Object.keys(job[x][y]['formula']) == 'reference') {
+        return replaceReference(job[x][y]['formula']['reference'], job);
     } else {
         console.error('Error: reference error!')
         return { 'error': 'referene not found' };
