@@ -7,45 +7,50 @@ const data = await getData();
 
 const jobs = data['jobs'];
 
-for (let i = 0; i < jobs.length; i++) {//loopina per viss darbus
-    for (let j = 0; j < jobs[i]['data'].length; j++) { //loopina per vieno is darbu data visas values
-        for (let k = 0; k < jobs[i]['data'][j].length; k++) { //loopina per values sudedamasias dalis, kurios yra arba values, arba formules
-            if (Object.keys(jobs[i]['data'][j][k]) == 'formula') {
-                if (Object.keys(jobs[i]['data'][j][k]['formula']) != 'reference') {
-                    handleJobReferences(jobs[i]['data'][j][k]['formula'])
-                    //siunciu sum:referensai
-                    //yra operatorius, todel reiks ir taisyti referensus, ir skaiciuoti
+for (let i = 0; i < jobs.length; i++) {//loopina per visus darbus kaip kad job1
+    for (let j = 0; j < jobs[i]['data'].length; j++) { //loopina per vieno is job visa data array, kuri sudaryta is kitu smulkesniu arrays, kuriu viduje yra formules arba values // sita perduoti i referencu funkcijas kaip job'a (tipas - array)
+        for (let k = 0; k < jobs[i]['data'][j].length; k++) { //loopina per array vidu, kurias sudaro objektai: values, arba formules, kuriu reiksmes irgi objektai. 
+            //ATSIJOJAM VALUES NUO FORMULU:
+            if (Object.keys(jobs[i]['data'][j][k]) == 'formula') { //jeigu objekto key yra formule, reiskia, reikes kazka keisti (nes value paliekam kaip yra)
+                //ATSIJOJAM TAS FORMULES, KURIOS BE OPERATORIU:
+                if (Object.keys(jobs[i]['data'][j][k]['formula']) == 'reference') { //
+                    const newValue = replaceReference(jobs[i]['data'][j][k]['formula']['reference'], jobs[i]['data']);
+                    console.log(newValue);
+                    if (Object.keys(newValue) == 'error') {
+                        jobs[i]['data'][j][k] = { 'error': newValue };
+                    } else {
+                        jobs[i]['data'][j][k] = { 'value': newValue };
+                    }
+                    //FORMULES SU OPERATORIAIS:
                 } else {
-                    handleJobReferences(jobs[i]['data'][j][k]); //siunciu formula:referensai
+
+                    // jobs[i]['data'][j][k]['formula'] = handleJobReferences(jobs[i]['data'][j][k]['formula'], jobs[i]['data']);
+                    //siunciu operatorius:referensai
+                    //yra operatorius, todel reiks ir taisyti referensus, ir skaiciuoti
+
+
+
+
                 }
             }
         }
     }
 }
 
-function handleJobReferences(job) {
-    for (let i = 0; i < job.length; i++) {
-        if (Object.keys(job[i]) == 'formula') {
-            for (let j = 0; j < job[i].length; j++) {
-                if (Object.keys(job[i][j]) == 'reference') {
-                    replaceReference(job, job[i][j])
-                }
-            }
-        }
 
-    }
-}
-function replaceReference(job, reference) {
+function replaceReference(reference, job) {
+    console.log('reference is' + reference);
     const splicedReference = reference.split("");
-    let x = charCodeAt(splicedReference[0] - 65);
-    let y = splicedReference[1] - 1;
-    if (Object.keys(job[x][y]) == 'value') {
-        return job[x][y];
-    } else if (Object.keys(job[x][y]) == 'reference') {
+    let y = (splicedReference[0].charCodeAt()) - 65;
+    let x = splicedReference[1] - 1;
+    console.log(x, y);
+    if (Object.keys(job[x][y]) && Object.keys(job[x][y]) == 'value') {
+        return { 'value': job[x][y] };
+    } else if (Object.keys(job[x][y]) && Object.keys(job[x][y]) == 'reference') {
         return replaceReference(job, job[x][y])
     } else {
         console.error('Error: reference error!')
-        return false;
+        return { 'error': 'referene not found' };
     }
 
 }
