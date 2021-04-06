@@ -16,11 +16,15 @@ for (let i = 0; i < jobs.length; i++) {//loopina per visus darbus kaip kad job1
                 if (Object.keys(jobs[i]['data'][j][k]['formula']) == 'reference') { //
                     console.log('from the job nr: ' + jobs[i]['id']);
                     const newValue = replaceReference(jobs[i]['data'][j][k]['formula']['reference'], jobs[i]['data']);
-                    console.log(newValue);
+                    console.log('before' + jobs[i]['data'][j][k]['formula']['reference']);
                     if (Object.keys(newValue) == 'error') {
                         jobs[i]['data'][j][k] = { 'error': newValue['error'] };
+                    } else if (Object.keys(newValue) == 'reference') {
+                        jobs[i]['data'][j][k] = { 'reference': newValue['reference'] };
+                        replaceReference(jobs[i]['data'][j][k]['formula']['reference'], jobs[i]['data']);
                     } else {
                         jobs[i]['data'][j][k] = { 'value': newValue['value'] };
+                        // alert(JSON.stringify(jobs[i]['data'][j][k]['value']));
                     }
                     //FORMULES SU OPERATORIAIS:
                 } else {
@@ -48,7 +52,9 @@ function replaceReference(reference, job) {
     if (Object.keys(job[x][y]) == 'value') {
         return { 'value': job[x][y] };
     } else if (Object.keys(job[x][y]['formula']) == 'reference') {
-        return replaceReference(job[x][y]['formula']['reference'], job);
+        return { 'reference': job[x][y]['formula'] }
+        // job[x][y]['formula']['reference'] 
+        // return replaceReference(job[x][y]['formula']['reference'], job);
     } else {
         console.error('Error: reference error!')
         return { 'error': 'referene not found' };
