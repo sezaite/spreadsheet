@@ -13,12 +13,11 @@ for (let i = 0; i < jobs.length; i++) {
             let mainObject = job[j][k];
             if (Object.keys(mainObject) == 'formula') {
                 if (Object.keys(mainObject['formula']) == 'reference') {
-                    const newValue = replaceReference(mainObject['formula']['reference'], job);
-                    console.log(JSON.stringify(newValue));
+                    let newValue = replaceReference(mainObject['formula']['reference'], job);
                     if (Object.keys(newValue) == 'error') {
-                        mainObject = { 'error': newValue['error'] };
+                        job[j][k] = { 'error': newValue['error'] };
                     } else {
-                        mainObject = { 'value': newValue['value'] };
+                        job[j][k] = { 'value': newValue['value'] };
                     }
                 } else {
                     // FORMULES SU OPERATORIAIS
@@ -32,7 +31,8 @@ for (let i = 0; i < jobs.length; i++) {
     }
 }
 
-console.log(JSON.stringify(jobs));
+console.log(JSON.stringify(jobs))
+
 function replaceReference(reference, job) {
     const splicedReference = reference.split("");
     let y = (splicedReference[0].charCodeAt()) - 65;
@@ -41,7 +41,7 @@ function replaceReference(reference, job) {
         return { 'value': job[x][y]['value'] };
     } else if (Object.keys(job[x][y]) == 'formula') {
         if (Object.keys(job[x][y]['formula'] == 'reference')) {
-            replaceReference(job[x][y]['formula']['reference'], job)
+            return replaceReference(job[x][y]['formula']['reference'], job);
         } else {
             return { 'error': 'formula does include something else' }
         }
