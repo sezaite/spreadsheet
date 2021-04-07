@@ -20,7 +20,20 @@ for (let i = 0; i < jobs.length; i++) {
                         job[j][k] = { 'value': newValue['value'] };
                     }
                 } else {
-                    // FORMULES SU OPERATORIAIS
+                    let afterOperatorArr = mainObject['formula'][Object.keys(mainObject['formula'])];
+                    for (let l = 0; l < afterOperatorArr.length; l++) {
+                        if (Object.keys(afterOperatorArr[l]) == 'reference') {
+                            let newValue = replaceReference(afterOperatorArr[l]['reference'], job);
+                            if (Object.keys(newValue) == 'error') {
+                                job[j][k] = { 'error': newValue['error'] };
+                            } else {
+                                job[j][k]['formula'][Object.keys(job[j][k]['formula'])] = { 'value': newValue['value'] };
+                            }
+                        } else {
+                            console.log('ten buvo value');
+                        }
+
+                    }
                 }
             } else {
                 //jei ne formules, o VALUES
@@ -83,3 +96,5 @@ function replaceReference(reference, job) {
     //     console.log(JSON.stringify(mainObject['formula']));
     //     newValue = replaceReference(mainObject['formula']['reference'], job);
     // }
+
+
