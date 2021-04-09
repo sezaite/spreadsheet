@@ -61,22 +61,43 @@ function handleReference(mainObj, job) {
 }
 
 function handleFormulas(formulaObj, job) {
+    console.log(formulaObj);
     let smallArr = [];
+    //formula objektas kurio value yra objektas kurio value array kurio sudedamosios dalys yra objektai
+    [
+        [
+            { "value": { "number": 2 } },
+            { "value": { "number": 1.5 } },
+
+            {
+                "formula": {
+                    "if": [{ "is_greater": [{ "reference": "A1" }, { "reference": "B1" }] }, { "reference": "A1" }, { "reference": "B1" }
+                    ]
+                }
+            }
+        ]
+    ];
+    smallArr = [
+        { "is_greater": [{ "reference": "A1" }, { "reference": "B1" }] },
+        { "reference": "A1" },
+        { "reference": "B1" }
+    ]
     if (Object.keys(formulaObj) == 'if') {
         smallArr = formulaObj['if'];
         if (!Array.isArray(smallArr)) {
             smallArr = [smallArr];
         }
-        const operator = Object.keys(formulaObj['if']);
-        const formulaValues = handleSmallArr(smallArr, job);
+        const operator = Object.keys(formulaObj['if'][0]);
+        const formulaValues = handleSmallArr(smallArr[operator], job); //cia klaida, kad issikviecia vel ta pati handle formulas, kuri returnina formula formula, todel i small arr reikia pasiusti tai, kas nebeturi formules savy, tik ta antra dali. reik nupjaut formules dali kazkaip
         return { 'formula': { 'if': { [operator]: [formulaValues] } } };
     } else {
+        //formula objektas kurio value yra objektas kurio value array
         smallArr = formulaObj[Object.keys(formulaObj)];
         if (!Array.isArray(smallArr)) {
             smallArr = [smallArr];
         }
         const operator = Object.keys(formulaObj);
-        const formulaValues = handleSmallArr(smallArr, job);
+        const formulaValues = handleBigArr(smallArr, job);
         return { 'formula': { [operator]: [formulaValues] } };
     }
 }
