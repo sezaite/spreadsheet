@@ -5,35 +5,45 @@ async function getData() {
 
 const data = await getData();
 const jobs = data['jobs'];
+const convertedJobs = referenceConvertionStart(jobs);
+console.log(JSON.stringify(convertedJobs));
 
-for (let i = 0; i < jobs.length; i++) {
-    let job = jobs[i]['data'];
-    for (let j = 0; j < job.length; j++) {
-        for (let k = 0; k < job[j].length; k++) {
-            let mainObject = job[j][k];
-            if (Object.keys(mainObject) == 'formula') {
-                if (Object.keys(mainObject['formula']) == 'reference') {
-                    let newValue = replaceReference(mainObject['formula']['reference'], job);
-                    if (Object.keys(newValue) == 'error') {
-                        job[j][k] = { 'error': newValue['error'] };
-                    } else {
-                        job[j][k] = { 'value': newValue['value'] };
-                    }
-                } else {
-                    // FORMULES SU OPERATORIAIS
-                }
-            } else {
-                //jei ne formules, o VALUES
-                //nieko nedaryti
+function referenceConvertionStart(jobs) {
+    let newJobs = [];
+    for (let i = 0; i < jobs.length; i++) {
+        newJobs.push({ "id": `job-${i}`, "data": handleBigArr(jobs[i]['data']) });
+    }
+    return newJobs;
+}
 
-            }
-        }
+function handleBigArr(job) {
+    let newJob = [];
+    for (let i = 0; i < job.length; i++) {
+        newJob.push(handleSmallArr(job[i], job))
+    }
+    return newJob;
+}
+
+function handleSmallArr(smallArr, job) {
+    let newSmallArr = [];
+    for (let i = 0; i < smallArr.length; i++) {
+        newSmallArr.push(handleMainObj(smallArr[i], job));
+    }
+    return newSmallArr;
+}
+
+function handleMainObj(mainObj, job) {
+    if (Object.keys(mainObj) == 'value' || Object.keys(mainObj) == 'error') {
+        return mainObj;
+    } else if (Object.keys(mainObj) == 'reference') {
+        return handleReference(mainObj, job);
+    } else {
+        return handleFormulas(mainObj, job);
     }
 }
 
-console.log(JSON.stringify(jobs))
-
-function replaceReference(reference, job) {
+function handleReference(mainObj, job) {
+    const reference = mainObj['reference'];
     const splicedReference = reference.split("");
     let y = (splicedReference[0].charCodeAt()) - 65;
     let x = splicedReference[1] - 1;
@@ -41,45 +51,62 @@ function replaceReference(reference, job) {
         return { 'value': job[x][y]['value'] };
     } else if (Object.keys(job[x][y]) == 'formula') {
         if (Object.keys(job[x][y]['formula'] == 'reference')) {
-            return replaceReference(job[x][y]['formula']['reference'], job);
+            return handleReference(job[x][y]['formula'], job);
         } else {
             return { 'error': 'formula does include something else' }
         }
     } else {
-        return { 'error': 'referene not found' };
+        return { 'error': 'reference not found' };
     }
 }
-// S T E P S :
 
-// A) JEI REFERENCES
-// 1) pagriebti mainObject['formula']['reference'] ir pasiusti stringa referensu tvarkytojui kartu su darbu (job);
-
-
-// N O T E S :
-
-    //job = jobs[i]['data'] - konkretus darbas, array tipas. viskas, kas eina po 'data', didzioji array; 
-
-    //job[j] = mazasis array, sudarytas is didziuju objektu. reprezentuos referenso skaicius  A1 - job[0];
-
-    // mainObject = job[j][k] - didieji objektai, kuriu key visuomet arba formula, arba value. outputs:
-    //    {"value":{"boolean":false}};
-    //    {"formula":{"not":{"reference":"A1"}}};
-    //    {"formula":{"reference":"E1"}};
-    //    {"formula":{"and":[{"reference":"A2"},{"reference":"B2"}]}};
-
-    //mainObject['formula'] - referensai arba operatoriai. mazesnieji OBJEKTAI. outputs:
-    //     {"and":[{"reference":"A1"},{"reference":"B1"}]};
-    //     {"reference":"C1"};
-    //     {"concat":[{"value":{"text":"Hello"}},{"value":{"text":", "}},{"value":{"text":"World!"}}]}
-
-    //mainObject['formula']['reference'] - referensai, bet ne formules. raide ir skaicius - stringai. galutine reiksme
+function handleFormulas(formulaObj, job) {
+    if (Object.keys(formulaObj['formula']) == 'if') {
+        let smallArr = formulaObj['formula']['if'];
+        if (!Array.isArray(smallArr)) {
+            smallArr = [smallArr];
+        }
+        let ifContent = handleSmallFormulas(smallArr, job); //grazina array su visuo, kas eina po if'o, jei yra if'as
+        return { 'formula': { 'if': [ifContent] } };
+    } else {
+        let smallArr = formulaObj['formula'];
+        if (!Array.isArray(smallArr)) {
+            smallArr = [smallArr];
+        }
+        let ifContent = handleSmallFormulas(smallArr, job);
+        return { 'formula': [ifContent] };
+    }
 
 
 
-    // else if (Object.keys(newValue) == 'reference') {
-    //     console.log('darbo numeris: ' + jobs[i]['id'])
-    //     console.log(JSON.stringify(mainObject['formula']['reference']) + ' pakeista i ' + JSON.stringify(newValue));
-    //     mainObject['formula']['reference'] = newValue['reference'];
-    //     console.log(JSON.stringify(mainObject['formula']));
-    //     newValue = replaceReference(mainObject['formula']['reference'], job);
+    function handleSmallFormulas(smallArr, job) {
+        let newArr = [];
+        for (let i = 0; i < smallArr.length; i++) {
+            if (Object.keys(smallArr[i]) == 'value') {
+                newArr.push(smallArr[i]);
+            } else if (Object.keys(smallArr[i]) == 'reference') {
+                newArr.push(handleReference(smallArr[i], job));
+            } else {
+                const formulaContent = handleSmallArr(smallArr[i][Object.keys(smallArr[i])], job); //cia man grazina sutvarkyta small arr
+                newArr.push({ [Object.keys(smallArr[i])]: [formulaContent] });
+            }
+
+        }
+        return newArr;
+    }
+}
+
+
+    //formula objektas kurio value yra objektas kurio value array kurio sudedamosios dalys yra objektai
+    // {
+    //     "formula": {
+    //         "if": [{ "is_greater": [{ "reference": "A1" }, { "reference": "B1" }] }, { "reference": "A1" }, { "reference": "B1" }
+    //         ]
+    //     }
     // }
+
+    // {
+    //     "formula": {
+    //         ["is_equal": [{ "reference": "A1" }, { "reference": "B1" }]]
+    //     }
+    // };
