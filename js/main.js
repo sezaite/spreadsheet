@@ -7,9 +7,8 @@ const data = await getData();
 const jobs = data['jobs'];
 const convertedJobs = referenceConvertionStart(jobs);
 console.log(JSON.stringify(convertedJobs));
-console.log(JSON.stringify(jobs));
 
-function referenceConvertionStart(jobs) {
+function referenceConvertionStart(jobs) { //LOOPING THROUGH THE WHOLE JSON
     let newJobs = [];
     for (let i = 0; i < jobs.length; i++) {
         newJobs.push({ "id": `job-${i}`, "data": handleBigArr(jobs[i]['data']) });
@@ -17,7 +16,7 @@ function referenceConvertionStart(jobs) {
     return newJobs;
 }
 
-function handleBigArr(job) {
+function handleBigArr(job) {// LOOPING THROUGH THE WHOLE JOB ARRAY WHICH IS MADE OF SMALLER ARRAYS
     let newJob = [];
     for (let i = 0; i < job.length; i++) {
         newJob.push(handleSmallArr(job[i], job))
@@ -25,30 +24,32 @@ function handleBigArr(job) {
     return newJob;
 }
 
-function handleSmallArr(smallArr, job) {
-    if (Array.isArray(smallArr)) {
-        let newSmallArr = [];
-        for (let i = 0; i < smallArr.length; i++) {
-            newSmallArr.push(handleMainObj(smallArr[i], job));
-        }
-        return newSmallArr;
+function handleSmallArr(smallArr, job) { //LOOPING THROUGH SMALLER ARRAYS WHICH ARE MADE OF VALUES OR FORMULAS
+    let newSmallArr = [];
+    for (let i = 0; i < smallArr.length; i++) {
+        newSmallArr.push(handleMainObj(smallArr[i], job));
+    }
+    return newSmallArr;
+}
+
+function handleMainObj(mainObject, job) {
+    if (Object.keys(mainObject) == 'value' || Object.keys(mainObject) == 'error') {
+        console.log('Objektas: ' + Object.keys(mainObject));
+        return mainObject;
     } else {
-        return handleMainObj(smallArr, job);
+        console.log('Objektas: ' + Object.keys(mainObject));
+        return { 'formula': handleFormulaTypes(mainObject['formula'], job) };
     }
 }
 
-function handleMainObj(mainObj, job) {
-    if (Object.keys(mainObj) == 'value' || Object.keys(mainObj) == 'error') {
-        return mainObj;
-    } else if (Object.keys(mainObj) == 'reference') {
-        return handleReference(mainObj, job);
-    } else {
-        return handleFormulas(mainObj, job);
+function handleFormulaTypes(formulaObj, job) {
+    if (Object.keys(formulaObj) == 'reference') { //basos formules su referensais
+        return handleReference(formulaObj, job);
     }
 }
 
-function handleReference(mainObj, job) {
-    const reference = mainObj['reference'];
+function handleReference(referenceObj, job) {
+    const reference = referenceObj['reference'];
     const splicedReference = reference.split("");
     let y = (splicedReference[0].charCodeAt()) - 65;
     let x = splicedReference[1] - 1;
@@ -58,58 +59,9 @@ function handleReference(mainObj, job) {
         if (Object.keys(job[x][y]['formula'] == 'reference')) {
             return handleReference(job[x][y]['formula'], job);
         } else {
-            return { 'error': 'formula does include something else' }
+            return { 'error': 'formula does not include no reference' }
         }
     } else {
         return { 'error': 'reference not found' };
     }
 }
-
-function handleFormulas(formulaObj, job) {
-    if (Object.keys(formulaObj['formula']) == 'if') {
-        let formulaContent = formulaObj['formula']['if'];
-        let ifContent = handleSmallFormulas(formulaContent, job); //grazina array su visuo, kas eina po if'o, jei yra if'as
-        let operator = formulaObj['formula']['if'][Object.keys(formulaObj['formula']['if'])];
-        return { 'formula': { 'if': { [operator]: [ifContent] } } };
-    } else if (Object.keys(formulaObj['formula']) == 'reference') {
-        let formulaContent = formulaObj['formula'];
-        let content = handleReference(formulaContent, job);
-        return { 'formula': [content] };
-    } else {
-        let formulaContent = formulaObj['formula'];
-        let operator = formulaObj['formula'][Object.keys(formulaObj['formula'])];
-        console.log(formulaObj['formula'][Object.keys(formulaObj['formula'])])
-        let ifContent = handleSmallFormulas(formulaContent, job);
-        return { 'formula': { [operator]: [ifContent] } };
-    }
-
-
-
-    function handleSmallFormulas(formulaContent, job) {
-
-        if (Array.isArray(formulaContent)) {
-            let newArr = [];
-            for (let i = 0; i < formulaContent.length; i++) {
-                console.log(formulaContent[i]);
-                newArr.push(handleMiniArr(formulaContent[i], job));
-            }
-            return newArr;
-        } else {
-            console.log(formulaContent);
-            return handleMiniArr(formulaContent, job);
-        }
-    }
-}
-
-function handleMiniArr(obj, job) {
-    if (Object.keys(obj) == 'value') {
-        return obj;
-    } else if (Object.keys(obj) == 'reference') {
-        return handleReference(obj, job);
-    } else {
-        const formulaContent = handleSmallArr(obj[Object.keys(obj)], job);
-        return { [Object.keys(obj)]: [formulaContent] };
-    }
-}
-
-

@@ -8,41 +8,33 @@ const jobs = data['jobs'];
 const convertedJobs = referenceConvertionStart(jobs);
 console.log(JSON.stringify(convertedJobs));
 
-
 function referenceConvertionStart(jobs) {
     let newJobs = [];
     for (let i = 0; i < jobs.length; i++) {
-        console.log(jobs[i]['id']);
         newJobs.push({ "id": `job-${i}`, "data": handleBigArr(jobs[i]['data']) });
     }
     return newJobs;
 }
 
-function handleBigArr(job) { //pasiuncia po darba
+function handleBigArr(job) {
     let newJob = [];
     for (let i = 0; i < job.length; i++) {
-        newJob.push(handleSmallArr(job[i], job)) //gauna po array bloka ir sukisa i viena atnaujinta darba, viskas ok
+        newJob.push(handleSmallArr(job[i], job))
     }
     return newJob;
 }
 
-function handleSmallArr(smallArr, job) { //sitas turi sutvrkyti visa didiji darbo bloka bloka
-    //gaunam blokus kuriuos sudaro arba pavieniai objektai (formules arba values), arba arrays is formuliu ir values
-    // if (Array.isArray(smallArr) && smallArr.length > 1) { //jei array
+function handleSmallArr(smallArr, job) {
     let newSmallArr = [];
     for (let i = 0; i < smallArr.length; i++) {
-        newSmallArr.push(handleMainObj(smallArr[i], job)); //kiekviena objekteli is array bloko sutvakys
+        newSmallArr.push(handleMainObj(smallArr[i], job));
     }
     return newSmallArr;
 }
-// } else { //jei pavieniai
-//     return handleMainObj(smallArr[0], job); //sutvakys objekta, nes jis tik vienas
-// }
 
-
-function handleMainObj(mainObj, job) { //the main question ar cia value ar formula//REIKIA, KAD GRAZINTU OBJEKTUS
+function handleMainObj(mainObj, job) {
     if (Object.keys(mainObj) == 'value' || Object.keys(mainObj) == 'error') {
-        return mainObj; //jei value arba error tai tiesiog grazina viska kaip yra
+        return mainObj;
     } else if (Object.keys(mainObj) == 'reference') {
         return handleReference(mainObj, job);
     } else {
@@ -50,7 +42,7 @@ function handleMainObj(mainObj, job) { //the main question ar cia value ar formu
     }
 }
 
-function handleReference(mainObj, job) { //TURI GRAZINTI OBJEKTUS BL
+function handleReference(mainObj, job) {
     const reference = mainObj['reference'];
     const splicedReference = reference.split("");
     let y = (splicedReference[0].charCodeAt()) - 65;
@@ -70,21 +62,21 @@ function handleReference(mainObj, job) { //TURI GRAZINTI OBJEKTUS BL
 
 function handleFormulas(formulaObj, job) {
     if (Object.keys(formulaObj['formula']) == 'if') {
-        let formulaContent = formulaObj['formula']['if'];
-        let ifContent = handleSmallFormulas(formulaContent, job); //grazina array su visuo, kas eina po if'o, jei yra if'as
-        let operator = formulaObj['formula']['if'][Object.keys(formulaObj['formula']['if'])];
-        return { 'formula': { 'if': { [operator]: [ifContent] } } };
-    } else if (Object.keys(formulaObj['formula']) == 'reference') {
-        let formulaContent = formulaObj['formula'];
-        let content = handleReference(formulaContent, job);
-        return { 'formula': [content] };
+        let smallArr = formulaObj['formula']['if'];
+        if (!Array.isArray(smallArr)) {
+            smallArr = [smallArr];
+        }
+        let ifContent = handleSmallFormulas(smallArr, job); //grazina array su visuo, kas eina po if'o, jei yra if'as
+        return { 'formula': { 'if': [ifContent] } };
     } else {
-        let formulaContent = formulaObj['formula'];
-        let operator = formulaObj['formula'][Object.keys(formulaObj['formula'])];
-
-        let ifContent = handleSmallFormulas(formulaContent, job);
-        return { 'formula': { [operator]: [ifContent] } };
+        let smallArr = formulaObj['formula'];
+        if (!Array.isArray(smallArr)) {
+            smallArr = [smallArr];
+        }
+        let ifContent = handleSmallFormulas(smallArr, job);
+        return { 'formula': [ifContent] };
     }
+
 
 
     function handleSmallFormulas(formulaContent, job) {
@@ -101,6 +93,8 @@ function handleFormulas(formulaObj, job) {
     }
 }
 
+
+
 function handleMiniArr(obj, job) {
     if (Object.keys(obj) == 'value') {
         return obj;
@@ -111,5 +105,3 @@ function handleMiniArr(obj, job) {
         return { [Object.keys(obj)]: [formulaContent] };
     }
 }
-
-
