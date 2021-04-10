@@ -88,7 +88,10 @@ function handleFormulas(formulaObj, job) {
                 newArr.push(handleReference(smallArr[i], job));
             } else {
                 const formulaContent = handleSmallArr(smallArr[i][Object.keys(smallArr[i])], job); //cia man grazina sutvarkyta small arr
+                console.log(Object.keys(smallArr[i]));
+                console.log(formulaContent);
                 newArr.push({ [Object.keys(smallArr[i])]: [formulaContent] });
+                console.log({ [Object.keys(smallArr[i])]: [formulaContent] });
             }
 
         }
