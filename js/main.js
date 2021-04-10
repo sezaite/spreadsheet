@@ -11,7 +11,7 @@ console.log(JSON.stringify(convertedJobs));
 function referenceConvertionStart(jobs) {
     let newJobs = [];
     for (let i = 0; i < jobs.length; i++) {
-        newJobs.push(handleBigArr(jobs[i]['data']));
+        newJobs.push({ "id": `job-${i}`, "data": handleBigArr(jobs[i]['data']) });
     }
     return newJobs;
 }
@@ -74,7 +74,7 @@ function handleFormulas(formulaObj, job) {
             smallArr = [smallArr];
         }
         let ifContent = handleSmallFormulas(smallArr, job);
-        return { 'formula': { ifContent } };
+        return { 'formula': [ifContent] };
     }
 
 
@@ -87,26 +87,26 @@ function handleFormulas(formulaObj, job) {
             } else if (Object.keys(smallArr[i]) == 'reference') {
                 newArr.push(handleReference(smallArr[i], job));
             } else {
-                const formulaContent = handleSmallArr(smallArr[i][Object.keys(smallArr[i])]); //cia man grazina sutvarkyta small arr
+                const formulaContent = handleSmallArr(smallArr[i][Object.keys(smallArr[i])], job); //cia man grazina sutvarkyta small arr
                 newArr.push({ [Object.keys(smallArr[i])]: [formulaContent] });
             }
 
         }
         return newArr;
     }
-
+}
 
 
     //formula objektas kurio value yra objektas kurio value array kurio sudedamosios dalys yra objektai
-    {
-        "formula": {
-            "if": [{ "is_greater": [{ "reference": "A1" }, { "reference": "B1" }] }, { "reference": "A1" }, { "reference": "B1" }
-            ]
-        }
-    }
+    // {
+    //     "formula": {
+    //         "if": [{ "is_greater": [{ "reference": "A1" }, { "reference": "B1" }] }, { "reference": "A1" }, { "reference": "B1" }
+    //         ]
+    //     }
+    // }
 
-    {
-        "formula": {
-            ["is_equal": [{ "reference": "A1" }, { "reference": "B1" }]]
-        }
-    };
+    // {
+    //     "formula": {
+    //         ["is_equal": [{ "reference": "A1" }, { "reference": "B1" }]]
+    //     }
+    // };
