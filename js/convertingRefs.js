@@ -78,7 +78,6 @@ function handleFormulaBody(formula, job) {
             formulaBody = formulaBody;
             newFormulaArr.push({ [operator]: [formulaBody] });
         }
-        console.log(newFormulaArr);
         return newFormulaArr.flat();
     }
 }
