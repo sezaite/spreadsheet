@@ -74,7 +74,6 @@ function handleReference(referenceObj, job) {
 }
 
 function handleFormulaBody(formula, job) {
-    console.log(formula);
     let newFormulaArr = [];
     for (let i = 0; i < formula.length; i++) {
         if (Object.keys(formula[i]) == 'value') {
@@ -83,7 +82,6 @@ function handleFormulaBody(formula, job) {
             newFormulaArr.push(handleReference(formula[i], job));
         } else {
             const operator = Object.keys(formula[i]);
-            console.log(operator);
             const formulaBody = handleLittleFormula(formula[i][operator], job);
             newFormulaArr.push({ [operator]: [formulaBody] });
         }
@@ -106,14 +104,3 @@ function handleLittleFormula(formulaBody, job) {
     return newFormulaArr;
 }
 
-// {
-//     "id": "job-16", "data": [[{ "value": { "number": 2 } }, { "value": { "number": 1.5 } },
-
-
-//     { "formula": { "if": [{ "is_greater": [{ "reference": "A1" }, { "reference": "B1" }] }, { "reference": "A1" }, { "reference": "B1" }] } }
-
-//     ]]
-// }
-
-// { "formula": { "divide": [{ "reference": "A1" }, { "reference": "B1" }] } }
-// { "formula": { "sum": [{ "reference": "A1" }, { "reference": "B1" }] } }
