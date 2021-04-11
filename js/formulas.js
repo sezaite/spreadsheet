@@ -8,7 +8,6 @@ function whichOperation(cell) {
         case 'divide':
             return divide(cell['formula']['divide'][0]);
         case 'is_greater':
-            console.log(cell);
             return is_greater(cell['formula']['is_greater'][0]);
         case 'is_equal':
             return is_equal(cell['formula']['is_equal'][0]);
