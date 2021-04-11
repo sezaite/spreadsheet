@@ -8,14 +8,13 @@ function whichOperation(cell) {
         case 'divide':
             return divide(cell['formula']['divide'][0]);
         case 'is_greater':
-            console.log(cell);
             return is_greater(cell['formula']['is_greater'][0]);
         case 'is_equal':
             return is_equal(cell['formula']['is_equal'][0]);
         case 'not':
             return notOp(cell['formula']['not'][0]);
         case 'or':
-            orOp(cell['formula']['or'][0]);
+            return orOp(cell['formula']['or'][0]);
         case 'and':
             return andOp(cell['formula']['and'][0]);
         case 'concat':
