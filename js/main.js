@@ -9,7 +9,7 @@ async function getData() {
 const data = await getData();
 const jobs = data['jobs'];
 const convertedJobs = referenceConvertionStart(jobs);
-// console.log(JSON.stringify(convertedJobs));
+console.log(JSON.stringify(convertedJobs));
 const calculatedResult = calculatorStart(convertedJobs);
 // console.log(JSON.stringify(calculatedResult));
 

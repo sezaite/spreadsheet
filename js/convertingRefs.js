@@ -40,12 +40,43 @@ function handleFormulaTypes(formulaObj, job) {
         return { 'if': [formulaBody] };
     } else { // jei nera if tik operatorius {and: Array(2)}
         let operator = Object.keys(formulaObj);
-        let formulaBody = handleFormulaBody(formulaObj[operator], job); //COA KAZKAS NE TO ATSITINKA, formula body tampa undefined
+        let formulaBody = handleFormulaBody(formulaObj[operator], job);
 
         return { [operator]: [formulaBody] };
     }
 }
 
+function handleFormulaBody(formula, job) {
+    let newFormulaArr = [];
+    for (let i = 0; i < formula.length; i++) {
+        if (Object.keys(formula[i]) == 'value') {
+            newFormulaArr.push(formula[i]);
+        } else if (Object.keys(formula[i]) == 'reference') {
+            newFormulaArr.push(handleReference(formula[i], job));
+        } else {
+            const operator = Object.keys(formula[i]);
+            let formulaBody = handleLittleFormula(formula[i][operator], job);
+            formulaBody = formulaBody;
+            newFormulaArr.push({ [operator]: [formulaBody] });
+        }
+    }
+    return newFormulaArr;
+}
+
+
+function handleLittleFormula(formulaBody, job) {
+    let newFormulaArr = [];
+    for (let i = 0; i < formulaBody.length; i++) {
+        if (Object.keys(formulaBody[i]) == 'value' || Object.keys(formulaBody[i]) == 'error') {
+            newFormulaArr.push(formulaBody[i]);
+        } else if (Object.keys(formulaBody[i]) == 'reference') {
+            newFormulaArr.push(handleReference(formulaBody[i], job));
+        } else {
+            console.log('something important is missing');
+        }
+    }
+    return newFormulaArr;
+}
 
 function handleReference(referenceObj, job) {
     const reference = referenceObj['reference'];
@@ -63,38 +94,6 @@ function handleReference(referenceObj, job) {
     } else {
         return { 'error': 'reference not found' };
     }
-}
-
-function handleFormulaBody(formula, job) {
-    let newFormulaArr = [];
-    for (let i = 0; i < formula.length; i++) {
-        if (Object.keys(formula[i]) == 'value') {
-            newFormulaArr.push(formula[i]);
-        } else if (Object.keys(formula[i]) == 'reference') {
-            newFormulaArr.push(handleReference(formula[i], job));
-        } else {
-            const operator = Object.keys(formula[i]);
-            let formulaBody = handleLittleFormula(formula[i][operator], job);
-            formulaBody = formulaBody;
-            newFormulaArr.push({ [operator]: [formulaBody] });
-        }
-        return newFormulaArr.flat();
-    }
-}
-
-
-function handleLittleFormula(formulaBody, job) {
-    let newFormulaArr = [];
-    for (let i = 0; i < formulaBody.length; i++) {
-        if (Object.keys(formulaBody[i]) == 'value' || Object.keys(formulaBody[i]) == 'error') {
-            newFormulaArr.push(formulaBody[i]);
-        } else if (Object.keys(formulaBody[i]) == 'reference') {
-            newFormulaArr.push(handleReference(formulaBody[i], job));
-        } else {
-            console.log('something important is missing');
-        }
-    }
-    return newFormulaArr;
 }
 
 export { referenceConvertionStart }

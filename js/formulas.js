@@ -1,35 +1,35 @@
 function whichOperation(cell) {
-    console.log(Object.keys(cell['formula']));
-    switch (Object.keys(cell['formula'])) {
+    const key = Object.keys(cell['formula']).toString();
+    switch (key) {
         case "sum":
-            sum(cell['formula'][Object.keys(cell['formula'])])
+            sum((cell['formula']['sum']).flat());
             break;
         case "multiply":
-            operation = multiply;
+            multiply(cell['formula']['multiply']);
             break;
         case 'divide':
-            multiply(cell['formula'][Object.keys(cell['formula'])])
+            divide(cell['formula']['divide']);
             break;
         case 'is_greater':
-            divide(cell['formula'][Object.keys(cell['formula'])])
+            is_greater(cell['formula']['is_greater']);
             break;
         case 'is_equal':
-            is_greater(cell['formula'][Object.keys(cell['formula'])])
+            is_equal(cell['formula']['is_equal']);
             break;
         case 'not':
-            is_equal(cell['formula'][Object.keys(cell['formula'])])
+            notOp(cell['formula'][Object.keys(cell['formula'])]);
             break;
         case 'or':
-            orOp(cell['formula'][Object.keys(cell['formula'])])
+            orOp(cell['formula']['or']);
             break;
         case 'and':
-            andOp(cell['formula'][Object.keys(cell['formula'])])
+            andOp(cell['formula']['and']);
             break;
         case 'concat':
-            concat(cell['formula'][Object.keys(cell['formula'])])
+            concat(cell['formula']['concat']);
             break;
         case 'if':
-            ifOp(cell['formula'][Object.keys(cell['formula'])])
+            ifOp(cell['formula']['if']);
             break;
         default:
             console.log('something went wrong');
@@ -37,8 +37,10 @@ function whichOperation(cell) {
 }
 
 function sum(...args) {
+    console.log('laba diena');
     let sum = 0;
     for (let i = 0; i < args.length; i++) {
+        console.log(args[i]);
         sum += args[i];
     }
     return sum;
