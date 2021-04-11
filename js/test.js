@@ -26,16 +26,14 @@ function handleMainObj(mainObject, job) {
     if (Object.keys(mainObject) == 'value' || Object.keys(mainObject) == 'error') {
         return mainObject;
     } else {
-        if (Object.keys(mainObject['formula']) == 'reference') {
-            return handleReference(mainObject['formula'], job);
-        } else {
-            return { 'formula': handleFormulaTypes(mainObject['formula'], job) };
-        }
+        return { 'formula': handleFormulaTypes(mainObject['formula'], job) };
     }
 }
 
 function handleFormulaTypes(formulaObj, job) {
-    if (Object.keys(formulaObj) == 'if') {
+    if (Object.keys(formulaObj) == 'reference') { //basos formules su referensais
+        return handleReference(formulaObj, job);
+    } else if (Object.keys(formulaObj) == 'if') {
         let formulaBody = handleFormulaBody(formulaObj['if'], job);
         return { 'if': [formulaBody] };
     } else { // jei nera if tik operatorius {and: Array(2)}
