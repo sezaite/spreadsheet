@@ -30,102 +30,103 @@ function whichOperation(cell) {
 function sum(args) {
     let sum = 0;
     for (let i = 0; i < args.length; i++) {
-        if (Object.keys(args[i]['value']) !== 'number') {
+        if (Object.keys(args[i]['value']) != 'number') {
+            console.log(Object.keys(args[i]['value']));
             return { 'error': 'type does not match' }
         }
-        sum += args[i]['value'];
+        sum += args[i]['value']['number'];
     }
-    return { 'value': { 'number': [sum] } };
+    return { 'value': { 'number': sum } };
 }
 
 function multiply(args) {
-    let multiplied = 0;
+    let multiplied = 1;
     for (let i = 0; i < args.length; i++) {
-        if (Object.keys(args[i]['value']) !== 'number') {
+        if (Object.keys(args[i]['value']) != 'number') {
             return { 'error': 'type does not match' }
         }
-        multiplied *= args[i]['value'];
+        multiplied *= args[i]['value']['number'];
     }
-    return { 'value': { 'number': [multiplied] } };
+    return { 'value': { 'number': multiplied } };
 }
 
 function divide(args) {
-    let divided = 0;
-    for (let i = 0; i < args.length; i++) {
-        if (Object.keys(args[i]['value']) !== 'number') {
-            return { 'error': 'type does not match' }
-        }
-        divided /= args[i]['value'];
+    let a = args[0];
+    let b = args[1];
+    if (Object.keys(a['value']) != 'number' || Object.keys(b['value']) != 'number') {
+        return { 'error': 'type does not match' }
     }
-    return { 'value': { 'number': [divided] } };
+    let divided = a['value']['number'] / b['value']['number'];
+    return { 'value': { 'number': divided } };
 }
 
 function is_greater(args) {
     let a = args[0];
     let b = args[1];
-    if (Object.keys(a['value']) !== 'number' || Object.keys(b['value']) !== 'number') {
+    if (Object.keys(a['value']) != 'number' || Object.keys(b['value']) != 'number') {
         return { 'error': 'type does not match' }
     }
-    return { 'value': { 'boolean': [a['value'] > b['value']] } };
+    return { 'value': { 'boolean': a['value']['number'] > b['value']['number'] } };
 }
 
 function is_equal(args) {
     let a = args[0];
     let b = args[1];
-    if (Object.keys(a['value']) !== 'number' || Object.keys(b['value']) !== 'number') {
+    if (Object.keys(a['value']) != 'number' || Object.keys(b['value']) != 'number') {
         return { 'error': 'type does not match' }
     }
-    return { 'value': { 'boolean': [a['value'] > b['value']] } };
+    return { 'value': { 'boolean': a['value']['number'] == b['value']['number'] } };
 }
 
 function notOp(args) {
-    if (Object.keys(args['value']) !== 'boolean') {
+    if (Object.keys(args['value']) != 'boolean') {
         return { 'error': 'type does not match' }
     }
-    return { 'value': { 'boolean': [!(args['value'])] } };
+    return { 'value': { 'boolean': !args['value']['boolean'] } }
 }
 
 function orOp(args) {
+    console.log(args);
+    let truthCount = 0;
     for (let i = 0; i < args.length; i++) {
-        if (Object.keys(args[i]['value']) === 'boolean') {
-            continue
-        } else {
+        console.log(args[i]['value']);
+        if (Object.keys(args[i]['value']) != 'boolean') {
             return { 'error': 'type does not match' }
         }
-    }
-    for (let i = 0; i < args.length; i++) {
-        if (args[i]['value']) {
-            return { 'value': { 'boolean': true } };
+        if (args[i]['value']['boolean'] == true) {
+            truthCount++;
+            continue;
+        } else {
+            continue;
         }
-        return { 'value': { 'boolean': false } };
     }
+    return truthCount > 0 ? { 'value': { 'boolean': true } } : { 'value': { 'boolean': false } };
 }
 
 function andOp(args) {
     for (let i = 0; i < args.length; i++) {
-        if (Object.keys(args[i]['value']) === 'boolean') {
-            continue
-        } else {
+        if (Object.keys(args[i]['value']) != 'boolean') {
             return { 'error': 'type does not match' }
         }
-    }
-    for (let i = 0; i < args.length; i++) {
-        if (!(args[i]['value'])) {
+        if (args[i]['value']['boolean']) {
+            continue;
+        } else {
             return { 'value': { 'boolean': false } };
         }
-        return { 'value': { 'boolean': true } };
     }
+
+    return { 'value': { 'boolean': true } }
 }
 
 function concat(args) {
     let text = '';
     for (let i = 0; i < args.length; i++) {
-        if (Object.keys(args[i]['value']) !== 'text') {
+        if (Object.keys(args[i]['value']) != 'text') {
             return { 'error': 'type does not match' }
         }
-        text += args[i]['value'];
+        text += args[i]['value']['text'];
     }
-    return { 'value': { 'text': [text] } };
+    return { 'value': { 'text': text } };
 }
 
 function ifOp(formula) {
