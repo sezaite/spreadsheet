@@ -39,7 +39,7 @@ function handleFormulaTypes(formulaObj, job) {
         let formulaBody = isBodyArray(formulaObj['if'], job);
         return { 'if': [formulaBody] };
     } else { // jei nera if tik operatorius {and: Array(2)}
-        let operator = Object.keys(formulaObj);
+        let operator = (Object.keys(formulaObj));
         let formulaBody = isBodyArray(formulaObj[operator], job);
 
         return { [operator]: [formulaBody] };
