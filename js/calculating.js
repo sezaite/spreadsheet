@@ -11,20 +11,20 @@ function calculatorStart(convertedJobs) {
 function handleJobs(job) {
     let newJob = [];
     for (let i = 0; i < job.length; i++) {
-        newJob.push(handleJobArrayBlocks(job[i], job));
+        newJob.push(handleJobArrayBlocks(job[i]));
     }
     return newJob;
 }
 
-function handleJobArrayBlocks(jobBlock, job) {
+function handleJobArrayBlocks(jobBlock) {
     let newJobBlock = [];
     for (let i = 0; i < jobBlock.length; i++) {
-        newJobBlock.push(handleCells(jobBlock[i]), job)
+        newJobBlock.push(handleCells(jobBlock[i]))
     }
     return newJobBlock;
 }
 
-function handleCells(cell, job) {
+function handleCells(cell) {
     if (Object.keys(cell) == 'value') {
         return cell;
     } else {
@@ -32,12 +32,5 @@ function handleCells(cell, job) {
 
     }
 }
-
-// {
-//     "formula":
-
-//     { "if": [{ "is_greater": [{ "reference": "A1" }, { "reference": "B1" }] }, { "reference": "A1" }, { "reference": "B1" }] }
-
-// }
 
 export { calculatorStart };
