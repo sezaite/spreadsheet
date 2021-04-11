@@ -2,7 +2,7 @@ function whichOperation(cell) {
     const key = Object.keys(cell['formula']).toString();
     switch (key) {
         case "sum":
-            sum((cell['formula']['sum']).flat());
+            sum((cell['formula']['sum']));
             break;
         case "multiply":
             multiply(cell['formula']['multiply']);
@@ -36,7 +36,7 @@ function whichOperation(cell) {
     }
 }
 
-function sum(...args) {
+function sum(args) {
     console.log('laba diena');
     let sum = 0;
     for (let i = 0; i < args.length; i++) {
@@ -47,7 +47,7 @@ function sum(...args) {
 }
 
 
-function multiply(...args) {
+function multiply(args) {
     let multiplied = 0;
     for (let i = 0; i < args.length; i++) {
         multiplied *= args[i];
@@ -55,7 +55,7 @@ function multiply(...args) {
     return multiplied;
 }
 
-function divide(...args) {
+function divide(args) {
     let divided = 0;
     for (let i = 0; i < args.length; i++) {
         divided /= args[i];
@@ -63,19 +63,19 @@ function divide(...args) {
     return divided;
 }
 
-function is_greater(a, b) {
+function is_greater(args) {
     return a > b;
 }
 
-function is_equal(a, b) {
+function is_equal(args) {
     return a === b;
 }
 
-function notOp(arg) {
+function notOp(args) {
     return !arg;
 }
 
-function orOp(...args) {
+function orOp(args) {
     for (let i = 0; i < args.length; i++) {
         if (args[i]) {
             return true;
@@ -83,7 +83,7 @@ function orOp(...args) {
     }
 }
 
-function andOp(...args) {
+function andOp(args) {
     for (let i = 0; i < args.length; i++) {
         if (!args[i]) {
             return false;
@@ -92,7 +92,7 @@ function andOp(...args) {
     return true;
 }
 
-function concat(...args) {
+function concat(args) {
     let text = '';
     for (let i = 0; i < args.length; i++) {
         text += array[i];
