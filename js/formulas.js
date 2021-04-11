@@ -2,36 +2,26 @@ function whichOperation(cell) {
     const key = Object.keys(cell['formula']).toString();
     switch (key) {
         case "sum":
-            sum((cell['formula']['sum'][0]));
-            break;
+            return sum((cell['formula']['sum'][0]));
         case "multiply":
-            multiply(cell['formula']['multiply'][0]);
-            break;
+            return multiply(cell['formula']['multiply'][0]);
         case 'divide':
-            divide(cell['formula']['divide'][0]);
-            break;
+            return divide(cell['formula']['divide'][0]);
         case 'is_greater':
             console.log(cell);
-            is_greater(cell['formula']['is_greater'][0]);
-            break;
+            return is_greater(cell['formula']['is_greater'][0]);
         case 'is_equal':
-            is_equal(cell['formula']['is_equal'][0]);
-            break;
+            return is_equal(cell['formula']['is_equal'][0]);
         case 'not':
-            notOp(cell['formula']['not'][0]);
-            break;
+            return notOp(cell['formula']['not'][0]);
         case 'or':
             orOp(cell['formula']['or'][0]);
-            break;
         case 'and':
-            andOp(cell['formula']['and'][0]);
-            break;
+            return andOp(cell['formula']['and'][0]);
         case 'concat':
-            concat(cell['formula']['concat'][0]);
-            break;
+            return concat(cell['formula']['concat'][0]);
         case 'if':
-            ifOp(cell['formula']['if'][0]);
-            break;
+            return ifOp(cell['formula']['if'][0]);
         default:
             console.log(key);
             console.log(cell);
@@ -149,8 +139,7 @@ function ifOp(formula) {
     let formulaObj = { 'formula': { [formulaOp]: [formulaBod] } };
 
     let answer = whichOperation(formulaObj);
-
-    // return answer ? formula['if'][1] : formula['if'][2];
+    return answer ? formula[1] : formula[2];
 }
 
 
